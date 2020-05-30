@@ -18,11 +18,12 @@
         var trainingInput = [
           Number(pong.ball.dir.y > 0),
           (pong.paddles[1].y - pong.ball.y) / 400,
-          Number(pong.ball.x < pong.paddles[1].x),
+          Math.max(0, pong.paddles[1].x - pong.ball.x) / 300,
           Number(pong.ball.x > pong.paddles[1].x - pong.paddles[1].width / 2
             && pong.ball.x < pong.paddles[1].x + pong.paddles[1].width / 2),
-          Number(pong.ball.x > pong.paddles[1].x),
+          Math.max(0, pong.ball.x - pong.paddles[1].x) / 300,
         ];
+        // console.log(trainingInput)
         var trainingTarget = [Number(keys[37]) || 0, Number(keys[39]) || 0]
         for (let i = 0; i < 100; i++) {
           network.train(trainingInput, trainingTarget);
@@ -30,11 +31,12 @@
         network.process([
           Number(pong.ball.dir.y > 0),
           (pong.ball.y - pong.paddles[0].y + pong.paddles[0].height) / 400,
-          Number(pong.ball.x > pong.paddles[0].x),
+          Math.max(0, pong.ball.x - pong.paddles[0].x) / 300,
           Number(pong.ball.x > pong.paddles[0].x - pong.paddles[0].width / 2
             && pong.ball.x < pong.paddles[0].x + pong.paddles[0].width / 2),
-          Number(pong.ball.x < pong.paddles[0].x)
+          Math.max(0, pong.paddles[0].x - pong.ball.x) / 300
         ]);
+        // console.log(network.inputs)
         pong.setInput([{ right: network.outputs[1] > network.outputs[0], left: network.outputs[0] > network.outputs[1] },
         { right: keys[39], left: keys[37] }])
         pong.render(ctx);
