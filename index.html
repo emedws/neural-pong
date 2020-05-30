@@ -7,34 +7,38 @@
   <script src="math.js"></script>
   <script src="singleLayerNeuralNetwork.js"></script>
   <script>
-    var network;
-    var presets = [{ con_neu: [[0.2260688754008724, -0.58848224816346, -0.06990626518987675, 0.0012118253153929892], [-0.31445225987944836, -0.5420434647474939, -0.749811815708048, -0.8499164491167042]], neuronsBias: [-0.03827803566503718, 0.6499125315900467], con_out: [[0.8715930653048827, -0.5943007326645282], [0.6323349592771126, 0.35282189976935463]], outputsBias: [0.10683821184647435, 0.4077133132758517] }]
-    function setPreset(preset) {
-      Object.assign(network, presets[preset]);
-    }
     function init() {
       var canvas = document.getElementById('canvas');
       var ctx = canvas.getContext('2d');
       var pong = new Pong(50, 50, 300, 400);
-      network = new SingleLayerNeuralNetwork(4, 2, 2)
+      const network = new SingleLayerNeuralNetwork(5, 8, 2)
       var step = function () {
         ctx.fillStyle = 'gray';
         ctx.fillRect(0, 0, 800, 500);
-        network.process(
-          [
-            (pong.ball.dir.y < 0) * 1,
-            pong.paddles[0].x - pong.ball.x,
-            pong.ball.y,
-            pong.paddles[0].x
-          ]
-        );
-        //console.log(network.outputs)
+        var trainingInput = [
+          Number(pong.ball.dir.y > 0),
+          (pong.paddles[1].y - pong.ball.y) / 400,
+          Number(pong.ball.x < pong.paddles[1].x),
+          Number(pong.ball.x > pong.paddles[1].x - pong.paddles[1].width / 2
+            && pong.ball.x < pong.paddles[1].x + pong.paddles[1].width / 2),
+          Number(pong.ball.x > pong.paddles[1].x),
+        ];
+        var trainingTarget = [Number(keys[37]) || 0, Number(keys[39]) || 0]
+        for (let i = 0; i < 100; i++) {
+          network.train(trainingInput, trainingTarget);
+        }
+        network.process([
+          Number(pong.ball.dir.y > 0),
+          (pong.ball.y - pong.paddles[0].y + pong.paddles[0].height) / 400,
+          Number(pong.ball.x > pong.paddles[0].x),
+          Number(pong.ball.x > pong.paddles[0].x - pong.paddles[0].width / 2
+            && pong.ball.x < pong.paddles[0].x + pong.paddles[0].width / 2),
+          Number(pong.ball.x < pong.paddles[0].x)
+        ]);
         pong.setInput([{ right: network.outputs[1] > network.outputs[0], left: network.outputs[0] > network.outputs[1] },
         { right: keys[39], left: keys[37] }])
         pong.render(ctx);
-
-        network.draw(ctx, 400, 50, 350, 200);
-        //console.log(keys)
+        network.draw(ctx, 400, 50, 350, 300);
       };
       setInterval(step, 1000 / 60);
     }
@@ -51,8 +55,8 @@
 </head>
 
 <body onload="init()">
+  <h2>Move with arrow keys</h2>
   <div><canvas id="canvas" width="800" height="500"></canvas></div>
-  <div><button onclick="setPreset(0)">Preset 1</button></div>
 </body>
 
 </html>
