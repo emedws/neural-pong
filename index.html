@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 
 <head>
   <title>Neural network pong</title>
@@ -7,7 +8,7 @@
   <script src="singleLayerNeuralNetwork.js"></script>
   <script>
     var network;
-    var presets = [{"con_neu":[[0.2260688754008724,-0.58848224816346,-0.06990626518987675,0.0012118253153929892],[-0.31445225987944836,-0.5420434647474939,-0.749811815708048,-0.8499164491167042]],"neuronsBias":[-0.03827803566503718,0.6499125315900467],"con_out":[[0.8715930653048827,-0.5943007326645282],[0.6323349592771126,0.35282189976935463]],"outputsBias":[0.10683821184647435,0.4077133132758517]}]
+    var presets = [{ con_neu: [[0.2260688754008724, -0.58848224816346, -0.06990626518987675, 0.0012118253153929892], [-0.31445225987944836, -0.5420434647474939, -0.749811815708048, -0.8499164491167042]], neuronsBias: [-0.03827803566503718, 0.6499125315900467], con_out: [[0.8715930653048827, -0.5943007326645282], [0.6323349592771126, 0.35282189976935463]], outputsBias: [0.10683821184647435, 0.4077133132758517] }]
     function setPreset(preset) {
       Object.assign(network, presets[preset]);
     }
@@ -16,7 +17,7 @@
       var ctx = canvas.getContext('2d');
       var pong = new Pong(50, 50, 300, 400);
       network = new SingleLayerNeuralNetwork(4, 2, 2)
-      var step = function() {
+      var step = function () {
         ctx.fillStyle = 'gray';
         ctx.fillRect(0, 0, 800, 500);
         network.process(
@@ -27,29 +28,31 @@
             pong.paddles[0].x
           ]
         );
-        console.log(network.outputs)
-        pong.setInput([{right: network.outputs[1] > network.outputs[0], left: network.outputs[0] > network.outputs[1]},
-          {right: keys[39], left: keys[37]}])
+        //console.log(network.outputs)
+        pong.setInput([{ right: network.outputs[1] > network.outputs[0], left: network.outputs[0] > network.outputs[1] },
+        { right: keys[39], left: keys[37] }])
         pong.render(ctx);
 
         network.draw(ctx, 400, 50, 350, 200);
         //console.log(keys)
       };
-      setInterval(step, 1000/60);
+      setInterval(step, 1000 / 60);
     }
     var keys = {};
-    document.onkeydown=function(e){
-        e = e || window.event;
-        keys[e.keyCode] = true;
+    document.onkeydown = function (e) {
+      e = e || window.event;
+      keys[e.keyCode] = true;
     }
-    document.onkeyup=function(e){
-        e = e || window.event;
-        delete keys[e.keyCode];
+    document.onkeyup = function (e) {
+      e = e || window.event;
+      delete keys[e.keyCode];
     }
   </script>
 </head>
 
 <body onload="init()">
-  <canvas id="canvas" width="800" height="500"></canvas>
-  <button onclick="setPreset(0)">Preset 1</button>
+  <div><canvas id="canvas" width="800" height="500"></canvas></div>
+  <div><button onclick="setPreset(0)">Preset 1</button></div>
 </body>
+
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="math.js"></script>
+  <script src="singleLayerNeuralNetwork.js"></script>
+</head>
+
+<body>
+  <p>Points above the line should be red. blue otherwise.</p>
+  <div><canvas id="canvas" width="800" height="400"></canvas></div>
+  <script>
+    var nn = new SingleLayerNeuralNetwork(2, 4, 2);
+    test();
+
+    function train() {
+      for (let i = 0; i < 1000; i++) {
+        var train_input = [Math.random(), Math.random()];
+        // var distanceToCenter = Math.sqrt(Math.pow(Math.abs(0.5-train_input[0]),2)
+        //     + Math.pow(Math.abs(0.5-train_input[1]),2));
+        // train_input.push(distanceToCenter)
+        // var train_target = distanceToCenter < 0.25 ? [1, 0] : [0, 1];
+        var train_target = train_input[0] > train_input[1] ? [1, 0] : [0, 1];
+        nn.train(train_input, train_target);
+      }
+      test();
+    }
+
+    function test() {
+      var ctx = document.getElementById('canvas').getContext('2d');
+      ctx.fillStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.fillRect(0, 0, 800, 400);
+      ctx.strokeRect(50, 50, 300, 300);
+      ctx.beginPath();
+      ctx.moveTo(50,50);
+      ctx.lineTo(350,350);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(200, 200, 75, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 500; i++) {
+        var input = [Math.random(), Math.random()];
+        // var distanceToCenter = Math.sqrt(Math.pow(Math.abs(0.5-input[0]),2)
+        //     + Math.pow(Math.abs(0.5-input[1]),2));
+        //input.push(distanceToCenter);
+        nn.process(input);
+        var output = nn.outputs.indexOf(Math.max(...nn.outputs));
+        ctx.beginPath();
+        ctx.fillStyle = ['red', 'blue'][output];
+        ctx.arc(input[0]*300 + 50, input[1]*300 + 50, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      nn.draw(ctx, 400, 50, 350, 200);
+
+    }
+  </script>
+  <div>
+    <button onclick="test()">Test</button> <button onclick="train()">Train 1000 times</button>
+  </div>
+
+</html>
